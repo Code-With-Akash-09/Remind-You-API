@@ -47,12 +47,15 @@ if (cluster.isPrimary) {
 		res.send("Hello World!")
 	})
 
+	if (process.env.NODE_ENV !== "development") {
+		clientConnect()
+	}
+
 	mongoConnect()
 
-	if (process.env.NODE_ENV !== "production") {
-		const PORT = process.env.PORT || 8000
-		app.listen(PORT, () => console.log(`Server ready on port ${PORT}`))
-	}
+	app.listen(parseInt(process.env.PORT), () =>
+		console.log(`Server ready to roll on an anonymous port!`)
+	)
 }
 
 export default app
