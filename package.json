@@ -5,6 +5,7 @@
 	"main": "./src/server.js",
 	"type": "module",
 	"scripts": {
+		"start": "node src/server.js",
 		"prepare": "is-ci || husky install",
 		"release": "release-it",
 		"lint": "prettier --config prettier.config.cjs \"**/*.{js,ts,jsx,tsx,json}\" --write --ignore-unknown",
