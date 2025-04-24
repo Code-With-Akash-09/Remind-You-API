@@ -38,7 +38,7 @@ const checkUser = async body => {
 	return new Promise(async (resolve, reject) => {
 		let user_coll = await usercoll()
 		user_coll
-			.findOne({ mobileNo: body.mobileNo })
+			.findOne({ mobile: body.mobile })
 			.then(async result => {
 				if (result) {
 					let resp = {
