@@ -56,10 +56,20 @@ const checkUser = async body => {
 					user_coll
 						.insertOne(data)
 						.then(async result => {
+							const user = await user_coll.findOne({
+								_id: result.insertedId,
+							})
+
+							const tokenData = await createAccessandRefreshToken(
+								{
+									id: user.uid,
+								}
+							)
 							let resp = {
 								code: 201,
 								error: false,
 								message: "User created successfully",
+								token: tokenData.jwt,
 							}
 							resolve(resp)
 						})
