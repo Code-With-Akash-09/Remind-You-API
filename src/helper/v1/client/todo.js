@@ -200,14 +200,34 @@ const deleteTodoById = async (uid, todoId) => {
 	return new Promise(async (resolve, reject) => {
 		let todo_coll = await todocoll()
 		todo_coll
-			.deleteOne({ uid: uid, todoId: todoId })
+			.findOne({ uid: uid, todoId: todoId })
 			.then(async result => {
-				let resp = {
-					code: 200,
-					error: false,
-					message: "Todo deleted successfully",
+				if (result === null) {
+					let resp = {
+						code: 404,
+						error: true,
+						message: "Todo not found",
+					}
+					reject(resp)
 				}
-				resolve(resp)
+				todo_coll
+					.deleteOne({ uid: uid, todoId: todoId })
+					.then(async result => {
+						let resp = {
+							code: 200,
+							error: false,
+							message: "Todo deleted successfully",
+						}
+						resolve(resp)
+					})
+					.catch(err => {
+						let resp = {
+							code: 404,
+							error: true,
+							message: "Todo not found",
+						}
+						reject(resp)
+					})
 			})
 			.catch(err => {
 				let resp = {
