@@ -5,7 +5,7 @@ import {
 
 const getTaskState = async (req, res) => {
 	let uid = req.user.id
-	let statusId = req.params.statusId
+	let statusId = toString(req.params.statusId)
 	let page = req.query.page || 1
 	let limit = req.query.limit || 10
 
