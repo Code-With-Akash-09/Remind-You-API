@@ -39,7 +39,9 @@ const taskState = async (uid, statusId, page, limit) => {
 							parentId: data.parentId,
 							status: data.status,
 							createdAt: data.createdAt,
-							update1dAt: data.updatedAt,
+							updatedAt: data.updatedAt,
+							startDate: data.startDate,
+							endDate: data.endDate,
 						})),
 						pagination: pagination,
 					}
