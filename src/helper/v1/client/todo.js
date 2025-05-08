@@ -1,6 +1,7 @@
 import { todocoll, usercoll } from "../../../db/mongo.js"
 import { createTodoSchema } from "../../../modal/client/todo.js"
 import { getAllTodoQuery } from "../../../queries/v1/client/todo.js"
+import { getUTCDate } from "../general.js"
 
 const create = async (body, uid) => {
 	return new Promise(async (resolve, reject) => {
@@ -152,11 +153,17 @@ const update = async (uid, todoId, body) => {
 									type: body?.type || result?.type,
 									status: body?.status || result?.status,
 									startDate: body?.startDate
-										? new Date(body?.startDate)
-										: null || result?.startDate,
+										? getUTCDate(
+												body?.startDate,
+												1,
+												0,
+												0,
+												0
+										  )
+										: result?.startDate || null,
 									endDate: body?.endDate
-										? new Date(body?.endDate)
-										: null || result?.endDate,
+										? getUTCDate(body?.endDate, 1, 0, 0, 0)
+										: result?.endDate || null,
 								},
 							}
 						)
