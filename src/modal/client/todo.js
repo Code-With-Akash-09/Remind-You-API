@@ -1,4 +1,5 @@
 import { uuid } from "uuidv4"
+import { getUTCDate } from "../../helper/v1/general.js"
 import { general } from "../general.js"
 
 const createTodo = async (body, uid) => {
@@ -11,8 +12,10 @@ const createTodo = async (body, uid) => {
 		type: body?.type || null,
 		parentId: body?.parentId || null,
 		status: body?.status || null,
-		startDate: body?.startDate ? new Date(body?.startDate) : null,
-		endDate: body?.endDate ? new Date(body?.endDate) : null,
+		startDate: body?.startDate
+			? getUTCDate(body?.startDate, 1, 0, 0, 0)
+			: null,
+		endDate: body?.endDate ? getUTCDate(body?.endDate, 1, 0, 0, 0) : null,
 	}
 	return data
 }
