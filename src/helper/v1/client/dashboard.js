@@ -1,5 +1,6 @@
 import { todocoll } from "../../../db/mongo.js"
 import {
+	getCountQuery,
 	getSearchQuery,
 	getTaskStateQuery,
 } from "../../../queries/v1/client/dashboard.js"
@@ -122,4 +123,36 @@ const search = async (uid, query) => {
 	})
 }
 
-export { search as getSearchHelper, taskState as getTaskStateHelper }
+const getCount = async uid => {
+	return new Promise(async (resolve, reject) => {
+		let todo_coll = await todocoll()
+		const pipeline = await getCountQuery(uid)
+
+		todo_coll
+			.aggregate(pipeline)
+			.toArray()
+			.then(async result => {
+				let resp = {
+					code: 200,
+					error: false,
+					message: "Todo count get successfully",
+					result: result[0],
+				}
+				resolve(resp)
+			})
+			.catch(err => {
+				let resp = {
+					code: 500,
+					error: true,
+					message: "Error in getting todo count",
+				}
+				reject(resp)
+			})
+	})
+}
+
+export {
+	getCount as getCountHelper,
+	search as getSearchHelper,
+	taskState as getTaskStateHelper,
+}

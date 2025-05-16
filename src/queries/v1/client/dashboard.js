@@ -74,4 +74,182 @@ const getSearch = async (uid, query) => {
 	return pipeline
 }
 
-export { getSearch as getSearchQuery, getTaskState as getTaskStateQuery }
+const getCount = async uid => {
+	const matchStage = { uid }
+
+	const pipeline = [
+		{ $match: matchStage },
+		{
+			$group: {
+				_id: "$status",
+				count: { $sum: 1 },
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				statusCounts: {
+					$push: {
+						k: "$_id",
+						v: "$count",
+					},
+				},
+				total: { $sum: "$count" },
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				total: 1,
+				completed: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$statusCounts",
+												as: "item",
+												cond: {
+													$eq: [
+														"$$item.k",
+														"completed",
+													],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				inProgress: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$statusCounts",
+												as: "item",
+												cond: {
+													$eq: [
+														"$$item.k",
+														"in-progress",
+													],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				backlog: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$statusCounts",
+												as: "item",
+												cond: {
+													$eq: [
+														"$$item.k",
+														"backlog",
+													],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				cancelled: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$statusCounts",
+												as: "item",
+												cond: {
+													$eq: [
+														"$$item.k",
+														"cancelled",
+													],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				notStarted: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$statusCounts",
+												as: "item",
+												cond: {
+													$eq: [
+														"$$item.k",
+														"not-started",
+													],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+			},
+		},
+	]
+
+	return pipeline
+}
+
+export {
+	getCount as getCountQuery,
+	getSearch as getSearchQuery,
+	getTaskState as getTaskStateQuery,
+}
