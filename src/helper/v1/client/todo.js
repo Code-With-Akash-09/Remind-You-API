@@ -155,14 +155,14 @@ const update = async (uid, todoId, body) => {
 									startDate: body?.startDate
 										? getUTCDate(
 												body?.startDate,
-												1,
+												2,
 												0,
 												0,
 												0
 										  )
 										: result?.startDate || null,
 									endDate: body?.endDate
-										? getUTCDate(body?.endDate, 1, 0, 0, 0)
+										? getUTCDate(body?.endDate, 2, 0, 0, 0)
 										: result?.endDate || null,
 								},
 							}
