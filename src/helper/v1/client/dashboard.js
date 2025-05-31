@@ -1,6 +1,7 @@
 import { todocoll } from "../../../db/mongo.js"
 import {
 	getCountQuery,
+	getPriorityQuery,
 	getSearchQuery,
 	getTaskStateQuery,
 } from "../../../queries/v1/client/dashboard.js"
@@ -39,6 +40,7 @@ const taskState = async (uid, statusId, page, limit) => {
 							type: data.type,
 							parentId: data.parentId,
 							status: data.status,
+							priority: data.priority,
 							createdAt: data.createdAt,
 							updatedAt: data.updatedAt,
 							startDate: data.startDate,
@@ -95,6 +97,7 @@ const search = async (uid, query) => {
 							type: data.type,
 							parentId: data.parentId,
 							status: data.status,
+							priority: data.priority,
 							createdAt: data.createdAt,
 							updatedAt: data.updatedAt,
 							startDate: data.startDate,
@@ -151,8 +154,37 @@ const getCount = async uid => {
 	})
 }
 
+const getPriority = async uid => {
+	return new Promise(async (resolve, reject) => {
+		let todo_coll = await todocoll()
+		const pipeline = await getPriorityQuery(uid)
+
+		todo_coll
+			.aggregate(pipeline)
+			.toArray()
+			.then(async result => {
+				let resp = {
+					code: 200,
+					error: false,
+					message: "Todo priority get successfully",
+					result: result[0],
+				}
+				resolve(resp)
+			})
+			.catch(err => {
+				let resp = {
+					code: 500,
+					error: true,
+					message: "Error in getting todo priority",
+				}
+				reject(resp)
+			})
+	})
+}
+
 export {
 	getCount as getCountHelper,
+	getPriority as getPriorityHelper,
 	search as getSearchHelper,
 	taskState as getTaskStateHelper,
 }

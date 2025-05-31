@@ -11,6 +11,7 @@ const createTodo = async (body, uid) => {
 		type: body?.type || null,
 		parentId: body?.parentId || null,
 		status: body?.status || null,
+		priority: body?.priority || null,
 		startDate: new Date(body?.startDate) || null,
 		endDate: new Date(body?.endDate) || null,
 	}
