@@ -47,6 +47,10 @@ if (cluster.isPrimary) {
 		res.send("Hello World!")
 	})
 
+	app.get("/ping", (req, res) => {
+		res.status(200).send("OK")
+	})
+
 	if (process.env.NODE_ENV !== "development") {
 		clientConnect()
 	}
