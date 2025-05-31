@@ -75,7 +75,7 @@ const getSearch = async (uid, query) => {
 }
 
 const getCount = async uid => {
-	const matchStage = { uid }
+	const matchStage = { uid, type: "file" }
 
 	const pipeline = [
 		{ $match: matchStage },
@@ -248,8 +248,143 @@ const getCount = async uid => {
 	return pipeline
 }
 
+const getPriority = async uid => {
+	const matchStage = { uid, type: "file" }
+
+	const pipeline = [
+		{ $match: matchStage },
+		{
+			$group: {
+				_id: "$priority",
+				count: { $sum: 1 },
+			},
+		},
+		{
+			$group: {
+				_id: null,
+				priorityCounts: {
+					$push: {
+						k: "$_id",
+						v: "$count",
+					},
+				},
+				total: { $sum: "$count" },
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				total: 1,
+				high: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$priorityCounts",
+												as: "item",
+												cond: {
+													$eq: ["$$item.k", "high"],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				mid: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$priorityCounts",
+												as: "item",
+												cond: {
+													$eq: ["$$item.k", "medium"],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				low: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$priorityCounts",
+												as: "item",
+												cond: {
+													$eq: ["$$item.k", "low"],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+				no: {
+					$ifNull: [
+						{
+							$arrayElemAt: [
+								{
+									$map: {
+										input: {
+											$filter: {
+												input: "$priorityCounts",
+												as: "item",
+												cond: {
+													$eq: ["$$item.k", "no"],
+												},
+											},
+										},
+										as: "matched",
+										in: "$$matched.v",
+									},
+								},
+								0,
+							],
+						},
+						0,
+					],
+				},
+			},
+		},
+	]
+
+	return pipeline
+}
+
 export {
 	getCount as getCountQuery,
+	getPriority as getPriorityQuery,
 	getSearch as getSearchQuery,
 	getTaskState as getTaskStateQuery,
 }

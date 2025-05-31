@@ -75,6 +75,7 @@ const getAll = async (uid, query, page, limit) => {
 							type: data.type,
 							parentId: data.parentId,
 							status: data.status,
+							priority: data.priority,
 							createdAt: data.createdAt,
 							updatedAt: data.updatedAt,
 							startDate: data.startDate,
@@ -151,6 +152,8 @@ const update = async (uid, todoId, body) => {
 									content: body?.content || result?.content,
 									type: body?.type || result?.type,
 									status: body?.status || result?.status,
+									priority:
+										body?.priority || result?.priority,
 									startDate:
 										new Date(body?.startDate) ||
 										result?.startDate,
