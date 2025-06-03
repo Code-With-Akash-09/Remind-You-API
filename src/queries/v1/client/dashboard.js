@@ -23,8 +23,35 @@ const getTaskState = async (uid, statusId, page, limit) => {
 		}
 	} else if (statusId === "backlog") {
 		matchStage = {
+			endDate: {
+				$lt: new Date(today.setUTCHours(0, 0, 0, 0)),
+			},
+			status: {
+				$ne: "completed",
+			},
+		}
+	} else if (statusId === "completed") {
+		matchStage = {
+			status: "completed",
+		}
+	} else if (statusId === "cancelled") {
+		matchStage = {
+			status: "cancelled",
+		}
+	} else if (statusId === "not-started") {
+		matchStage = {
+			status: "not-started",
+		}
+	} else if (statusId === "ongoing") {
+		matchStage = {
 			startDate: {
-				$lt: today,
+				$lte: new Date(today.setUTCHours(23, 59, 59, 99)),
+			},
+			endDate: {
+				$gte: new Date(today.setUTCHours(0, 0, 0, 0)),
+			},
+			status: {
+				$nin: ["completed", "cancelled"],
 			},
 		}
 	}
