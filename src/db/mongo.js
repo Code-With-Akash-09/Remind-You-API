@@ -1,23 +1,25 @@
-import "dotenv/config";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import "dotenv/config"
+import { MongoClient, ServerApiVersion } from "mongodb"
 
 const client = new MongoClient(process.env.COMMUNITY_URI, {
 	serverApi: {
 		version: ServerApiVersion.v1,
 		strict: true,
 		deprecationErrors: true,
-	}
-});
+	},
+})
 
-let _db, user_coll, todo_coll;
+let _db, user_coll, todo_coll, learn_coll
 
 const mongoConnect = async () => {
 	new Promise(async (resolve, reject) => {
-		await client.connect()
+		await client
+			.connect()
 			.then(async client => {
 				_db = await client.db()
 				user_coll = await _db.collection("users")
 				todo_coll = await _db.collection("todos")
+				learn_coll = await _db.collection("learns")
 				resolve()
 			})
 			.catch(err => {
@@ -31,7 +33,7 @@ const mongoConnect = async () => {
 			console.log("Error connecting to database")
 			console.log(err)
 		})
-};
+}
 
 const usercoll = async () => {
 	if (user_coll) return user_coll
@@ -43,5 +45,9 @@ const todocoll = async () => {
 	throw "Todos collection not found"
 }
 
-export { mongoConnect, todocoll, usercoll };
+const learncoll = async () => {
+	if (learn_coll) return learn_coll
+	throw "Learn collection not found"
+}
 
+export { learncoll, mongoConnect, todocoll, usercoll }

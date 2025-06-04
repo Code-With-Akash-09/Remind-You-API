@@ -7,6 +7,7 @@ import { cpus } from "os"
 import { mongoConnect } from "./db/mongo.js"
 import authRouter from "./routes/v1/auth/auth.js"
 import dashboardRouter from "./routes/v1/client/dashboard.js"
+import learnRouter from "./routes/v1/client/learn.js"
 import clientRouter from "./routes/v1/client/todo.js"
 import userRouter from "./routes/v1/client/user.js"
 
@@ -42,6 +43,7 @@ if (cluster.isPrimary) {
 	app.use("/v1/todos", clientRouter)
 	app.use("/v1/todos/dashboard", dashboardRouter)
 	app.use("/v1/user", userRouter)
+	app.use("/v1/learn", learnRouter)
 
 	app.get("/", (req, res) => {
 		res.send("Hello World!")
