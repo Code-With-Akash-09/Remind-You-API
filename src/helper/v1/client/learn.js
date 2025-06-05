@@ -116,7 +116,10 @@ const getAllPublic = async (query, page, limit) => {
 	return new Promise(async (resolve, reject) => {
 		let learn_coll = await learncoll()
 		const pipeline = await getAllLearnPublicQuery(page, limit, query)
-		const totalCount = await learn_coll?.countDocuments({})
+		const totalCount = await learn_coll?.countDocuments({
+			parentId: query.parentId,
+			access: "public",
+		})
 
 		learn_coll
 			.aggregate(pipeline)
