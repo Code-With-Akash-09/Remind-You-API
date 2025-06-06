@@ -6,6 +6,7 @@ import {
 	getLearnByIdHelper,
 	getUpdateLearnHelper,
 } from "../../../helper/v1/client/learn.js"
+import { uploadFileCloudinary } from "../../../services/upload.js"
 
 const create = async (req, res) => {
 	let body = req.body
@@ -186,6 +187,48 @@ const deleteLearnById = async (req, res) => {
 		})
 }
 
+const uploadAssets = async (req, res) => {
+	const { image, video } = req.files || {}
+
+	if (!image && !video) {
+		return res.status(400).json({
+			message: "No file provided",
+			error: true,
+			code: 400,
+		})
+	}
+
+	try {
+		const [imageResult, videoResult] = await Promise.all([
+			image?.[0] ? uploadFileCloudinary(image[0].path) : null,
+			video?.[0] ? uploadFileCloudinary(video[0].path, true) : null,
+		])
+
+		const results = {
+			...(imageResult ? { image: imageResult.data } : {}),
+			...(videoResult ? { video: videoResult.data } : {}),
+		}
+
+		res.status(200).json({
+			message: "Files uploaded successfully",
+			error: false,
+			code: 200,
+			results,
+		})
+	} catch (err) {
+		res.status(err?.code || 500).json({
+			message: "Error in uploading files",
+			error: err?.error || true,
+			code: err?.code || 500,
+			results: {
+				data: {
+					error: err?.message || "Unknown error",
+				},
+			},
+		})
+	}
+}
+
 export {
 	create,
 	deleteLearnById,
@@ -193,4 +236,5 @@ export {
 	getAllPublic,
 	getLearnById,
 	update,
+	uploadAssets,
 }
