@@ -243,9 +243,55 @@ const deleteTodoById = async (uid, todoId) => {
 	})
 }
 
+const deleteTodosById = async (uid, todoIds) => {
+	return new Promise(async (resolve, reject) => {
+		let todo_coll = await todocoll()
+		todo_coll
+			.find({ uid: uid, todoId: { $in: todoIds } })
+			.toArray()
+			.then(async result => {
+				if (result === null) {
+					let resp = {
+						code: 404,
+						error: true,
+						message: "Todos not found",
+					}
+					reject(resp)
+				}
+				todo_coll
+					.deleteMany({ uid: uid, todoId: { $in: todoIds } })
+					.then(async result => {
+						let resp = {
+							code: 200,
+							error: false,
+							message: "Todos deleted successfully",
+						}
+						resolve(resp)
+					})
+					.catch(err => {
+						let resp = {
+							code: 404,
+							error: true,
+							message: "Failed to delete todos",
+						}
+						reject(resp)
+					})
+			})
+			.catch(err => {
+				let resp = {
+					code: 404,
+					error: true,
+					message: "Todos not found",
+				}
+				reject(resp)
+			})
+	})
+}
+
 export {
 	create as createTodoHelper,
 	deleteTodoById as deleteTodoByIdHelper,
+	deleteTodosById as deleteTodosByIdHelper,
 	getAll as getAllTodoHelper,
 	getTodoById as getTodoByIdHelper,
 	update as getUpdateTodoHelper,
